@@ -1,0 +1,11 @@
+{
+  "unstable": ["raw-imports"],
+  "tasks": {
+    // jalanin app dari source (mode dev)
+    "dev": "deno run -A --no-check --unstable-ffi --unstable-raw-imports app.ts",
+    // compile + patch GUI subsystem + icon → ytdlp-gui.exe
+    "build": "deno run -A --no-check --unstable-ffi --unstable-raw-imports release.ts",
+    // build + zip ke dist/ (contoh: deno task release 1.0.0)
+    "release": "deno run -A --no-check --unstable-ffi --unstable-raw-imports release.ts"
+  }
+}

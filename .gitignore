@@ -1,0 +1,15 @@
+# hasil build (didistribusikan via GitHub Releases, bukan di repo)
+ytdlp-gui.exe
+ytdlp-gui.log
+
+# tool pihak ketiga (download link ada di README)
+tools/
+
+# folder hasil auto-download deps saat runtime
+bin/
+
+# sampah test lokal
+test-*/
+
+# hasil release zip
+dist/

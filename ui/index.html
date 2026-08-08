@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>yt-dlp downloader</title>
+<script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("theme")||"dark")}catch(e){}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%236366f1'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><path d='M32 14v22M22 28l10 10 10-10' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/><line x1='18' y1='48' x2='46' y2='48' stroke='white' stroke-width='6' stroke-linecap='round'/></svg>">
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<header>
+  <svg width="30" height="30" viewBox="0 0 64 64" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lg)"/><path d="M32 14v22M22 28l10 10 10-10" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="48" x2="46" y2="48" stroke="white" stroke-width="6" stroke-linecap="round"/></svg>
+  <h1>yt-dlp <span style="color:var(--muted);font-weight:500">downloader</span></h1>
+  <span id="st-ytdlp" class="badge">cek…</span>
+  <span class="spacer"></span>
+  <button id="btn-theme" class="ghost" style="padding:7px 9px" title=""></button>
+  <select id="sel-lang" title="Language / Bahasa" style="width:auto;padding:6px 8px;font-weight:600"><option value="id">ID</option><option value="en">EN</option></select>
+  <button id="btn-info" class="ghost" data-tt="infoT" title="Tentang aplikasi"><span data-ic="info"></span></button>
+  <button id="btn-update" class="ghost" data-t="update" data-tt="updateT"><span data-ic="refresh"></span> Update yt-dlp</button>
+  <button id="btn-quit" class="ghost" data-t="quit" data-tt="quitT"><span data-ic="power"></span> Keluar</button>
+</header>
+<main>
+
+<div id="setup-banner" class="banner hidden"></div>
+
+<section>
+  <div class="urlbar">
+    <input id="url" data-tp="urlPh" placeholder="Tempel URL playlist / video di sini…" spellcheck="false">
+    <button id="btn-paste" data-t="paste"><span data-ic="clipboard"></span> Tempel</button>
+    <button id="btn-fetch" class="primary" data-t="fetch"><span data-ic="search"></span> Ambil Info</button>
+  </div>
+  <div class="sites"><span data-t="canDo">Bisa download dari:</span>
+    <span class="chip">YouTube</span><span class="chip">TikTok</span><span class="chip">Instagram</span>
+    <span class="chip">X / Twitter</span><span class="chip">Facebook</span>
+    <span class="chip more" data-t="chipMore">dll</span>
+  </div>
+</section>
+
+<section id="plinfo" class="hidden">
+  <div class="plinfo">
+    <img id="pl-thumb" alt="">
+    <div>
+      <h2 id="pl-title"></h2>
+      <p id="pl-meta"></p>
+    </div>
+  </div>
+</section>
+
+<section id="options" class="hidden">
+  <div class="tabs">
+    <button class="tab active" data-mode="video" data-t="video"><span data-ic="film"></span> Video</button>
+    <button class="tab" data-mode="audio" data-t="audio"><span data-ic="music"></span> Audio</button>
+  </div>
+
+  <div id="opts-video" class="opt-grid">
+    <div class="opt"><label data-t="res">Resolusi</label>
+      <select id="res">
+        <option value="best" data-t="resBest">Terbaik (maksimal)</option>
+        <option value="2160">4K / 2160p</option>
+        <option value="1440">1440p</option>
+        <option value="1080" selected>1080p Full HD</option>
+        <option value="720">720p HD</option>
+        <option value="480">480p</option>
+        <option value="360">360p</option>
+      </select>
+    </div>
+    <div class="opt"><label data-t="fmt">Format file</label>
+      <select id="container">
+        <option value="mp4" selected>MP4</option>
+        <option value="mkv">MKV</option>
+        <option value="webm">WebM</option>
+      </select>
+    </div>
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="h264" checked> <span data-t="h264">Utamakan codec H.264 (kompatibel)</span></span>
+    </div>
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="subs"> <span data-t="subs">Download subtitle</span></span>
+    </div>
+    <div class="opt"><label data-t="subLangs">Bahasa subtitle</label>
+      <input id="sublangs" value="id,en">
+    </div>
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="esubs"> <span data-t="esubs">Tempel subtitle ke video</span></span>
+    </div>
+  </div>
+
+  <div id="opts-audio" class="opt-grid hidden">
+    <div class="opt"><label data-t="aformat">Format audio</label>
+      <select id="aformat">
+        <option value="mp3" selected>MP3</option>
+        <option value="m4a">M4A (AAC)</option>
+        <option value="opus">OPUS</option>
+        <option value="flac">FLAC (lossless)</option>
+        <option value="wav">WAV</option>
+      </select>
+    </div>
+    <div class="opt"><label data-t="aquality">Kualitas / bitrate</label>
+      <select id="aquality">
+        <option value="best" selected data-t="best">Terbaik</option>
+        <option value="320K">320 kbps</option>
+        <option value="256K">256 kbps</option>
+        <option value="192K">192 kbps</option>
+        <option value="128K">128 kbps</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="opt-grid">
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="numbering" checked> <span data-t="numbering">Nomor urut playlist di nama file</span></span>
+    </div>
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="emeta" checked> <span data-t="emeta">Embed metadata</span></span>
+    </div>
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="ethumb" checked> <span data-t="ethumb">Embed thumbnail</span></span>
+    </div>
+    <div class="opt"><label>&nbsp;</label>
+      <span class="chk"><input type="checkbox" id="sponsor"> <span data-t="sponsor">SponsorBlock (potong iklan sponsor)</span></span>
+    </div>
+    <div class="opt"><label data-t="cookies">Cookies browser (utk video member/dibatasi)</label>
+      <select id="cookies">
+        <option value="none" selected data-t="cookiesNone">Tidak pakai</option>
+        <option value="chrome">Chrome</option>
+        <option value="edge">Edge</option>
+        <option value="firefox">Firefox</option>
+      </select>
+    </div>
+    <div class="opt"><label data-t="rate">Batas kecepatan (kosong = unlimited, cth: 5M)</label>
+      <input id="rate" placeholder="">
+    </div>
+    <div class="opt"><label data-t="conc">Download bersamaan</label>
+      <select id="conc">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div class="opt" style="grid-column:1/-1"><label data-t="outdir">Folder tujuan</label>
+      <div class="row" style="flex-wrap:nowrap">
+        <input id="outdir" style="flex:1" spellcheck="false">
+        <button id="btn-browse" data-t="browse"><span data-ic="folder"></span> Pilih Folder…</button>
+        <button id="btn-open" data-t="open" data-tt="openT" title="Buka folder tujuan di Explorer (buat lihat hasil download)"><span data-ic="external"></span> Lihat Hasil</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="listwrap" class="hidden">
+  <div class="list-actions">
+    <button id="sel-all" data-t="selAll"><span data-ic="checkSquare"></span> Pilih Semua</button>
+    <button id="sel-none" data-t="selNone"><span data-ic="square"></span> Kosongkan</button>
+    <span id="sel-count" class="badge"></span>
+    <span class="spacer"></span>
+    <button id="btn-download" class="primary" data-t="downloadSel"><span data-ic="download"></span> Download Terpilih</button>
+  </div>
+  <div id="video-list"></div>
+</section>
+
+<section id="downloads" class="hidden">
+  <div class="row" style="margin-bottom:10px">
+    <b style="font-size:15px" data-t="queue"><span data-ic="download" data-sz="17"></span> Antrean Download</b>
+    <span class="spacer"></span>
+    <button id="btn-clear" class="ghost" style="font-size:12px" data-t="clear"><span data-ic="trash"></span> Bersihkan selesai</button>
+  </div>
+  <div id="overall"></div>
+  <div id="jobs"></div>
+</section>
+
+<details>
+  <summary data-t="logT"><span data-ic="terminal"></span> Log yt-dlp</summary>
+  <pre id="log"></pre>
+</details>
+
+</main>
+
+<div class="modal-overlay" id="modal-info">
+  <div class="modal">
+    <svg width="52" height="52" viewBox="0 0 64 64"><defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#mg)"/><path d="M32 14v22M22 28l10 10 10-10" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="48" x2="46" y2="48" stroke="white" stroke-width="6" stroke-linecap="round"/></svg>
+    <h2>yt-dlp <span style="color:var(--muted);font-weight:500">downloader</span></h2>
+    <p class="mdesc" data-t="aboutDesc">GUI desktop untuk yt-dlp — download video & audio.</p>
+    <div class="mrow"><span data-t="aboutBy">Dibuat oleh</span> <b>jauhariel</b></div>
+    <a class="mlink" id="link-repo" href="https://github.com/jauhariel/ytdlp-gui">
+      <span class="mtitle"><span data-ic="github"></span> github.com/jauhariel/ytdlp-gui</span>
+      <span class="msub" data-t="aboutSrc">Kode sumber & lapor bug</span>
+    </a>
+    <p class="mthanks"><span data-t="aboutThanks">Ditenagai oleh</span> yt-dlp · FFmpeg · Deno · WebView2</p>
+    <button class="primary" data-close style="width:100%;justify-content:center" data-t="close">Tutup</button>
+  </div>
+</div>
+
+<script>/*__JS__*/</script>
+</body>
+</html>

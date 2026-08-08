@@ -1,0 +1,15 @@
+const path = Deno.args[0] || "ytdlp-gui.exe";
+const f = await Deno.open(path, { read: true, write: true });
+const off = new Uint8Array(4);
+await f.seek(0x3c, Deno.SeekMode.Start);
+await f.read(off);
+const pe = new DataView(off.buffer).getUint32(0, true);
+const sub = new Uint8Array(2);
+await f.seek(pe + 0x5c, Deno.SeekMode.Start);
+await f.read(sub);
+console.log(path, "subsystem sebelum:", new DataView(sub.buffer).getUint16(0, true));
+new DataView(sub.buffer).setUint16(0, 2, true);
+await f.seek(pe + 0x5c, Deno.SeekMode.Start);
+await f.write(sub);
+f.close();
+console.log(path, "→ WINDOWS GUI");
