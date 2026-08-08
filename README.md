@@ -48,6 +48,7 @@ User cukup download **`ytdlp-gui.exe`** saja → double-click → langsung pakai
 | 📦 Auto-download | yt-dlp & FFmpeg otomatis didownload ke folder `bin/` kalau belum ada (portable, bisa dicopy ke PC lain) |
 | 🌗 Dark/Light mode | Toggle tema di header, tersimpan otomatis |
 | 🌍 Dwibahasa | Antarmuka Indonesia / English |
+| 🔔 Cek update | Notifikasi otomatis kalau ada versi baru di GitHub Releases |
 
 ### Struktur File
 
@@ -123,6 +124,7 @@ tools\rcedit-x64.exe ytdlp-gui.exe --set-icon app.ico   # pasang icon aplikasi
 - Pengaturan terakhir otomatis tersimpan
 - Kalau ada masalah, cek file `ytdlp-gui.log`
 - Kalau WebView2 tidak tersedia di PC lain, otomatis fallback buka via browser (app-mode)
+- **Cara update aplikasi**: kalau ada versi baru, muncul tombol hijau di header → klik → download zip terbaru dari Releases → timpa `ytdlp-gui.exe` lama
 
 ---
 
@@ -161,6 +163,7 @@ Users only need to download **`ytdlp-gui.exe`** → double-click → ready to us
 | 📦 Auto-download | yt-dlp & FFmpeg auto-download into `bin/` when missing (portable — copy the folder to another PC and it just works) |
 | 🌗 Dark/Light mode | Theme toggle in the header, saved automatically |
 | 🌍 Bilingual | Indonesian / English interface |
+| 🔔 Update check | Automatic notification when a new version hits GitHub Releases |
 
 ### File Structure
 
@@ -236,3 +239,4 @@ tools\rcedit-x64.exe ytdlp-gui.exe --set-icon app.ico   # apply app icon
 - Your last settings are saved automatically
 - If something goes wrong, check the `ytdlp-gui.log` file
 - If WebView2 is unavailable on another PC, it falls back to browser app-mode automatically
+- **How to update the app**: when a new version is out, a green button appears in the header → click it → download the latest zip from Releases → replace the old `ytdlp-gui.exe`

@@ -9,6 +9,7 @@ import {
   ensureDeps, FFMPEG_LOC, FFMPEG_OK, SETUP, setYtdlpVer, YTDLP_PATH, YTDLP_VER,
 } from "./deps.ts";
 import { killWindowChild } from "./window.ts";
+import { APP_VERSION, REPO, REPO_URL } from "./version.ts";
 import { sm } from "./i18n.ts";
 import { pump } from "./jobs.ts";
 import { PAGE } from "./ui.ts";
@@ -186,6 +187,55 @@ async function openApi(req: Request): Promise<Response> {
   return json({ ok: true });
 }
 
+// ---------------- cek update aplikasi (GitHub Releases) ----------------
+// hasil di-cache 6 jam supaya tak spam API GitHub
+let updateCache: { checked: number; latest: string | null; url: string } | null = null;
+
+function isNewer(a: string, b: string): boolean {
+  const pa = a.split(".").map((x) => parseInt(x, 10) || 0);
+  const pb = b.split(".").map((x) => parseInt(x, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    if ((pa[i] || 0) > (pb[i] || 0)) return true;
+    if ((pa[i] || 0) < (pb[i] || 0)) return false;
+  }
+  return false;
+}
+
+async function checkUpdateApi(): Promise<Response> {
+  const now = Date.now();
+  if (!updateCache || now - updateCache.checked > 6 * 3600_000) {
+    let latest: string | null = null;
+    let url = REPO_URL + "/releases";
+    try {
+      const r = await fetch(
+        "https://api.github.com/repos/" + REPO + "/releases/latest",
+        {
+          headers: {
+            "User-Agent": "ytdlp-downloader/" + APP_VERSION,
+            Accept: "application/vnd.github+json",
+          },
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+      if (r.ok) {
+        const j = await r.json();
+        latest = String(j.tag_name || "").replace(/^v/, "") || null;
+        url = String(j.html_url || url);
+      } else {
+        await r.body?.cancel();
+      }
+    } catch { /* offline / rate-limit → anggap tak ada update */ }
+    updateCache = { checked: now, latest, url };
+  }
+  const latest = updateCache.latest;
+  return json({
+    current: APP_VERSION,
+    latest,
+    update: latest ? isNewer(latest, APP_VERSION) : false,
+    url: updateCache.url,
+  });
+}
+
 async function updateApi(lang = "id"): Promise<Response> {
   if (!YTDLP_PATH) return json({ error: sm("noYtdlp", lang) });
   const r = await tryRun(YTDLP_PATH, ["-U"]);
@@ -226,6 +276,8 @@ export async function handler(req: Request): Promise<Response> {
   const p = u.pathname;
   if (p === "/") return new Response(PAGE, { headers: { "content-type": "text/html; charset=utf-8" } });
   if (p === "/api/events") return sse();
+  if (p === "/api/version") return json({ version: APP_VERSION });
+  if (p === "/api/check-update") return checkUpdateApi();
   if (p === "/api/status") {
     return json({
       ytdlp: !!YTDLP_PATH, version: YTDLP_VER, path: YTDLP_PATH,

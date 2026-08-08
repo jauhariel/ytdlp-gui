@@ -187,3 +187,6 @@ header{flex-wrap:wrap}
 .mtitle{display:flex;align-items:center;gap:7px;color:var(--accent);font-weight:600;font-size:13.5px}
 .msub{font-size:11.5px;color:var(--muted)}
 .mthanks{margin:2px 0 4px;font-size:11.5px;color:var(--muted)}
+.mver{color:var(--muted);font-size:12px;margin-top:-6px}
+.newver{color:var(--green)!important;border-color:var(--green)!important;font-weight:600;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}

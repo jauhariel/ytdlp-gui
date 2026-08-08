@@ -62,6 +62,7 @@ errUrl:"Masukkan URL yang valid",errPick:"Pilih minimal 1 video",errOutdir:"Isi 
 added:"{0} video masuk antrean",clipErr:"Gagal baca clipboard",
 setupFail:"Setup otomatis gagal: {0} — coba restart aplikasi",setupPrep:"Menyiapkan komponen dulu:",
 closedT:"Aplikasi ditutup",closedP:"Jendela ini boleh ditutup.",
+newVer:"Versi {0} tersedia! Klik tombol hijau di atas.",newVerT:"Download versi baru",
 toLight:"Mode terang",toDark:"Mode gelap",checking:"cek…",noYtdlp:"yt-dlp TIDAK ditemukan",
 infoT:"Tentang aplikasi",aboutDesc:"GUI desktop untuk yt-dlp — download video & audio.",aboutBy:"Dibuat oleh",aboutSrc:"Kode sumber & lapor bug",aboutThanks:"Ditenagai oleh",close:"Tutup"
 },
@@ -85,6 +86,7 @@ errUrl:"Enter a valid URL",errPick:"Select at least 1 video",errOutdir:"Set the 
 added:"{0} video(s) queued",clipErr:"Failed to read clipboard",
 setupFail:"Automatic setup failed: {0} — try restarting the app",setupPrep:"Setting up components first:",
 closedT:"App closed",closedP:"You may close this window.",
+newVer:"Version {0} is available! Click the green button above.",newVerT:"Download new version",
 toLight:"Switch to light mode",toDark:"Switch to dark mode",checking:"checking…",noYtdlp:"yt-dlp NOT found",
 infoT:"About this app",aboutDesc:"Desktop GUI for yt-dlp — download video & audio.",aboutBy:"Created by",aboutSrc:"Source code & bug reports",aboutThanks:"Powered by",close:"Close"
 }};
@@ -327,4 +329,14 @@ $("btn-quit").addEventListener("click",function(){
   post("/api/shutdown").then(function(){
     document.body.innerHTML='<div style="display:flex;height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:10px">'+LOGO+'<h2 style="margin:0">'+T("closedT")+'</h2><p style="color:var(--muted);margin:0">'+T("closedP")+'</p></div>';
   });
+});
+
+// ---------- versi app & cek update (GitHub Releases) ----------
+post("/api/version").then(function(r){var el=$("app-ver");if(el&&r.version)el.textContent="v"+r.version});
+post("/api/check-update").then(function(r){
+  if(r&&r.update){
+    var b=$("btn-newver");b.style.display="";$("newver-txt").textContent="v"+r.latest;
+    b.addEventListener("click",function(){post("/api/open-url",{url:r.url})});
+    toast(T("newVer",r.latest));
+  }
 });

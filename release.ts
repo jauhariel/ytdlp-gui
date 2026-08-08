@@ -23,6 +23,18 @@ await new Deno.Command("taskkill", {
   args: ["/F", "/IM", "ytdlp-gui.exe"], stdout: "null", stderr: "null",
 }).output();
 
+// 0b. stamp versi ke source (biar exe tahu versi dirinya)
+if (ver) {
+  await Deno.writeTextFile(
+    "src/version.ts",
+    '// versi aplikasi — di-stamp otomatis oleh release.ts saat `deno task release X.Y.Z`\n' +
+      'export const APP_VERSION = "' + ver + '";\n' +
+      'export const REPO = "jauhariel/ytdlp-gui";\n' +
+      'export const REPO_URL = "https://github.com/" + REPO;\n',
+  );
+  console.log("▶ versi distamp: " + ver);
+}
+
 // 1. compile ke single exe
 await run(DENO, [
   "compile", "--no-check", "-A", "--unstable-ffi", "--unstable-raw-imports", "-o", "ytdlp-gui", "app.ts",
