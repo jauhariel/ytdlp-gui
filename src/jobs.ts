@@ -12,6 +12,12 @@ function buildArgs(job: Job, o: Options): string[] {
     "--windows-filenames", "--encoding", "utf-8",
     "--progress-template",
     "download:[PG]%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s|%(progress.eta)s",
+    // koneksi ke googlevideo sering stall/reset di tengah jalan (throttle ISP /
+    // rate-limit YouTube habis burst). Default yt-dlp menyerah setelah 10 retry →
+    // job gagal total padahal resume masih bisa tembus. Jadikan gigih: retry tanpa
+    // batas + re-extract URL otomatis kalau speed jatuh di bawah 100KB/s.
+    "--retries", "infinite", "--fragment-retries", "infinite",
+    "--throttled-rate", "100K",
   ];
   if (FFMPEG_LOC) args.push("--ffmpeg-location", FFMPEG_LOC);
 
