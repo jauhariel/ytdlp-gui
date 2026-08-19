@@ -15,33 +15,28 @@ import { pump } from "./jobs.ts";
 import { PAGE } from "./ui.ts";
 
 // ---------------- API ----------------
-async function probeApi(req: Request): Promise<Response> {
-  if (!YTDLP_PATH) {
-    return json({
-      error: SETUP.running
-        ? "Tunggu sebentar — yt-dlp sedang didownload otomatis…"
-        : "yt-dlp tidak ditemukan. Restart aplikasi untuk auto-download, atau install manual: winget install yt-dlp",
-    });
-  }
-  const body = await req.json().catch(() => ({}));
-  const L = body.lang === "en" ? "en" : "id";
-  const url = String(body.url || "").trim();
-  if (!/^https?:\/\//i.test(url)) return json({ error: sm("badUrl", L) });
+// urutan browser yg dicoba saat mode cookies "auto"
+const COOKIE_SOURCES = ["chrome", "edge", "firefox"];
 
+// jalankan probe sekali dgn sumber cookies tertentu.
+// sukses → { ok:true, data }; gagal → { ok:false, error }
+async function probeOnce(url: string, cookies: string, L: string) {
   const args = ["--flat-playlist", "-J", "--no-warnings", "--no-colors", "--ignore-errors", url];
-  if (body.cookies && body.cookies !== "none") args.push("--cookies-from-browser", body.cookies);
-  log(">>> Ambil info: " + url);
+  if (cookies && cookies !== "none") args.push("--cookies-from-browser", cookies);
 
-  const r = await tryRun(YTDLP_PATH, args);
-  if (!r) return json({ error: sm("runFail", L) });
-  if (!r.out.trim()) return json({ error: (r.err || sm("noOut", L)).slice(0, 500) });
+  const r = await tryRun(YTDLP_PATH!, args);
+  if (!r) return { ok: false as const, error: sm("runFail", L) };
+  if (!r.out.trim()) return { ok: false as const, error: (r.err || sm("noOut", L)).slice(0, 500) };
 
   let j: any;
-  try { j = JSON.parse(r.out); } catch { return json({ error: sm("badJson", L) }); }
+  try { j = JSON.parse(r.out); } catch { return { ok: false as const, error: sm("badJson", L) }; }
+  // yt-dlp gagal total (mis. bot-check YouTube) → stdout "null"; pakai stderr sbg pesan
+  if (!j || typeof j !== "object") {
+    return { ok: false as const, error: (r.err || sm("noVid", L)).slice(0, 500) };
+  }
 
   const site = String(j.extractor_key || j.ie_key || "");
   const isYT = /youtube/i.test(site) || /youtube\.com|youtu\.be/.test(url);
-  const isYTItem = isYT; // playlist YouTube → extractor_key = "YoutubeTab"
   const isList = !!j.entries;
   const raw = (j.entries ? [...j.entries] : [j]).filter((e: any) => e);
   const items = raw.map((e: any, i: number) => {
@@ -72,15 +67,51 @@ async function probeApi(req: Request): Promise<Response> {
     };
   }).filter((v: any) => v.url);
 
-  if (!items.length) return json({ error: sm("noVid", L) });
-  return json({
-    title: j.title || items[0].title,
-    uploader: j.uploader || j.channel || j.uploader_id || "",
-    site: isYT ? "YouTube" : (site ? site.charAt(0).toUpperCase() + site.slice(1) : ""),
-    isPlaylist: !!j.entries,
-    count: items.length,
-    items,
-  });
+  if (!items.length) return { ok: false as const, error: sm("noVid", L) };
+  return {
+    ok: true as const,
+    data: {
+      title: j.title || items[0].title,
+      uploader: j.uploader || j.channel || j.uploader_id || "",
+      site: isYT ? "YouTube" : (site ? site.charAt(0).toUpperCase() + site.slice(1) : ""),
+      isPlaylist: !!j.entries,
+      count: items.length,
+      items,
+      cookies: cookies === "none" ? "" : cookies, // sumber cookies terpakai (info utk UI)
+    },
+  };
+}
+
+async function probeApi(req: Request): Promise<Response> {
+  if (!YTDLP_PATH) {
+    return json({
+      error: SETUP.running
+        ? "Tunggu sebentar — yt-dlp sedang didownload otomatis…"
+        : "yt-dlp tidak ditemukan. Restart aplikasi untuk auto-download, atau install manual: winget install yt-dlp",
+    });
+  }
+  const body = await req.json().catch(() => ({}));
+  const L = body.lang === "en" ? "en" : "id";
+  const url = String(body.url || "").trim();
+  if (!/^https?:\/\//i.test(url)) return json({ error: sm("badUrl", L) });
+
+  const choice = String(body.cookies || "auto");
+  // auto: coba Chrome → Edge → Firefox → tanpa cookies (pakai yg pertama berhasil)
+  const sources = choice === "auto" ? [...COOKIE_SOURCES, "none"] : [choice];
+
+  log(">>> Ambil info: " + url);
+  let lastErr = sm("noVid", L);
+  for (const ck of sources) {
+    const res = await probeOnce(url, ck, L);
+    if (res.ok) {
+      cfg.cookies = ck; // ingat utk dipakai proses download
+      if (choice === "auto") log(">>> Cookies otomatis: " + (ck === "none" ? "tanpa cookies" : ck));
+      return json(res.data);
+    }
+    lastErr = res.error;
+    if (choice === "auto") log(">>> " + (ck === "none" ? "tanpa cookies" : "cookies " + ck) + " gagal");
+  }
+  return json({ error: lastErr });
 }
 
 async function downloadApi(req: Request): Promise<Response> {
@@ -91,6 +122,8 @@ async function downloadApi(req: Request): Promise<Response> {
   const o = body.options as Options;
   if (!items.length) return json({ error: sm("noItems", L) });
   if (!o || !o.outDir) return json({ error: sm("noOutdir", L) });
+  // cookies "auto" → pakai hasil deteksi dari probe terakhir
+  if (!o.cookies || o.cookies === "auto") o.cookies = cfg.cookies || "none";
 
   cfg.lastOpts = o;
   cfg.lastLang = L;

@@ -35,7 +35,7 @@ export interface Options {
   subLangs: string;
   embedSubs: boolean;
   sponsor: boolean;
-  cookies: string;        // none | chrome | edge | firefox
+  cookies: string;        // none | auto | chrome | edge | firefox
   rate: string;           // "" | "5M" dst
   concurrent: number;
   outDir: string;
@@ -48,6 +48,7 @@ export const cfg = {
   maxConcurrent: 2,
   lastOpts: null as Options | null,
   lastLang: "id",
+  cookies: "none" as string, // sumber cookies hasil deteksi otomatis dari probe terakhir
 };
 
 // ---------------- SSE broadcast ----------------

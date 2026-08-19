@@ -41,7 +41,7 @@ User cukup download **`ytdlp-gui.exe`** saja → double-click → langsung pakai
 | 🖼 Embed | Thumbnail (album art) & metadata |
 | 💬 Subtitle | Download / tempel ke video, pilih bahasa (default: id,en) |
 | ✂ SponsorBlock | Potong segmen sponsor otomatis |
-| 🍪 Cookies browser | Untuk video member/age-restricted (Chrome/Edge/Firefox) |
+| 🍪 Cookies browser | Otomatis deteksi (Chrome → Edge → Firefox → tanpa cookies) |
 | ⚡ Multi-download | S/d 4 download bersamaan + batas kecepatan opsional |
 | 📊 Progress real-time | Persen, kecepatan, ETA per video + log lengkap |
 | 🔄 Update yt-dlp | Tombol update langsung dari aplikasi |
@@ -120,7 +120,7 @@ tools\rcedit-x64.exe ytdlp-gui.exe --set-icon app.ico   # pasang icon aplikasi
 
 - **Auto-download komponen**: pas pertama dibuka, aplikasi cek yt-dlp & FFmpeg. Kalau belum ada, otomatis didownload ke folder `bin/` di sebelah exe (ada banner progress di aplikasi). Folder `ytdlp/` jadi bisa dicopy ke USB/PC lain dan langsung jalan.
 - Default folder tujuan: `Downloads\yt-dlp` (bisa diubah, tersimpan otomatis)
-- Kalau kena "Sign in to confirm you're not a bot" → pilih cookies browser di opsi
+- Cookies browser otomatis: kalau kena "Sign in to confirm you're not a bot", app otomatis coba Chrome → Edge → Firefox sampai berhasil
 - Pengaturan terakhir otomatis tersimpan
 - Kalau ada masalah, cek file `ytdlp-gui.log`
 - Kalau WebView2 tidak tersedia di PC lain, otomatis fallback buka via browser (app-mode)
@@ -156,7 +156,7 @@ Users only need to download **`ytdlp-gui.exe`** → double-click → ready to us
 | 🖼 Embedding | Thumbnail (album art) & metadata |
 | 💬 Subtitles | Download / embed into video, language picker (default: id,en) |
 | ✂ SponsorBlock | Automatically cut sponsor segments |
-| 🍪 Browser cookies | For members-only/age-restricted videos (Chrome/Edge/Firefox) |
+| 🍪 Browser cookies | Auto-detect (Chrome → Edge → Firefox → no cookies) |
 | ⚡ Multi-download | Up to 4 concurrent downloads + optional speed limit |
 | 📊 Real-time progress | Percent, speed, ETA per video + full log |
 | 🔄 yt-dlp updates | Update button right in the app |
@@ -235,7 +235,7 @@ tools\rcedit-x64.exe ytdlp-gui.exe --set-icon app.ico   # apply app icon
 
 - **Component auto-download**: on first launch the app checks for yt-dlp & FFmpeg. If missing, they're downloaded into the `bin/` folder next to the exe (progress banner in the app). The whole `ytdlp/` folder can be copied to a USB/another PC and works as-is.
 - Default download folder: `Downloads\yt-dlp` (changeable, saved automatically)
-- If you hit "Sign in to confirm you're not a bot" → pick browser cookies in the options
+- Browser cookies are automatic: on "Sign in to confirm you're not a bot", the app tries Chrome → Edge → Firefox until one works
 - Your last settings are saved automatically
 - If something goes wrong, check the `ytdlp-gui.log` file
 - If WebView2 is unavailable on another PC, it falls back to browser app-mode automatically

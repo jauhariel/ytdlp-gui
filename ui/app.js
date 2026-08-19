@@ -49,7 +49,7 @@ video:"Video",audio:"Audio",res:"Resolusi",resBest:"Terbaik (maksimal)",fmt:"For
 h264:"Utamakan codec H.264 (kompatibel)",subs:"Download subtitle",subLangs:"Bahasa subtitle",esubs:"Tempel subtitle ke video",
 aformat:"Format audio",aquality:"Kualitas / bitrate",best:"Terbaik",
 numbering:"Nomor urut playlist di nama file",emeta:"Embed metadata",ethumb:"Embed thumbnail",
-sponsor:"SponsorBlock (potong iklan sponsor)",cookies:"Cookies browser (utk video member/dibatasi)",cookiesNone:"Tidak pakai",
+sponsor:"SponsorBlock (potong iklan sponsor)",cookies:"Cookies browser (otomatis)",cookiesAuto:"Otomatis",cookiesNone:"Tidak pakai",
 rate:"Batas kecepatan (kosong = unlimited, cth: 5M)",conc:"Download bersamaan",
 outdir:"Folder tujuan",browse:"Pilih Folder…",browsing:"Pilih folder…",open:"Lihat Hasil",
 openT:"Buka folder tujuan di Explorer (buat lihat hasil download)",
@@ -73,7 +73,7 @@ video:"Video",audio:"Audio",res:"Resolution",resBest:"Best (maximum)",fmt:"File 
 h264:"Prefer H.264 codec (compatible)",subs:"Download subtitles",subLangs:"Subtitle languages",esubs:"Embed subtitles into video",
 aformat:"Audio format",aquality:"Quality / bitrate",best:"Best",
 numbering:"Playlist numbering in filename",emeta:"Embed metadata",ethumb:"Embed thumbnail",
-sponsor:"SponsorBlock (cut sponsor segments)",cookies:"Browser cookies (for member/restricted videos)",cookiesNone:"None",
+sponsor:"SponsorBlock (cut sponsor segments)",cookies:"Browser cookies (automatic)",cookiesAuto:"Auto",cookiesNone:"None",
 rate:"Speed limit (empty = unlimited, e.g. 5M)",conc:"Concurrent downloads",
 outdir:"Destination folder",browse:"Browse…",browsing:"Browsing…",open:"Open Folder",
 openT:"Open destination folder in Explorer (view downloads)",
@@ -186,7 +186,7 @@ $("btn-fetch").addEventListener("click",function(){
     $("options").classList.remove("hidden");
     $("listwrap").classList.remove("hidden");
     $("pl-title").textContent=r.title+(r.isPlaylist?"":"");
-    $("pl-meta").textContent=(r.site?r.site+" • ":"")+(r.uploader?r.uploader+" • ":"")+r.count+" video"+(r.isPlaylist?" (playlist)":"");
+    $("pl-meta").textContent=(r.site?r.site+" • ":"")+(r.uploader?r.uploader+" • ":"")+r.count+" video"+(r.isPlaylist?" (playlist)":"")+(r.cookies?" • cookies: "+r.cookies:"");
     var first=items[0];$("pl-thumb").src=first.thumb||"";
     $("pl-thumb").onerror=function(){$("pl-thumb").style.visibility="hidden"};
     renderList();
